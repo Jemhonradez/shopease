@@ -1,0 +1,25 @@
+@use "../base/variables" as vars;
+
+.edit-details, .create-product {
+  position: fixed;
+  display: grid;
+  visibility: hidden;
+  opacity: 0;
+  gap: 1rem;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+  transform: scale(0.95) translate(-50%, -50%);
+  background-color: vars.$background-color;
+  box-shadow: vars.$small-box-shadow;
+  border-radius: vars.$large-radius;
+  padding: 1.5rem;
+  transition: 500ms vars.$bounce-bezier;
+
+  &.show {
+    display: grid;
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1) translate(-50%, -50%);
+  }
+}

@@ -1,0 +1,53 @@
+@use "base/reset";
+@use "base/variables";
+@use "base/typography";
+
+@use "layout/header";
+@use "layout/flex";
+@use "layout/form";
+
+@use "components/navbar";
+@use "components/footer";
+
+@use "utils/button";
+@use "utils/dividers";
+@use "utils/card";
+@use 'utils/loading';
+@use 'utils/popup';
+
+@use "pages/home";
+@use "pages/auth";
+@use "pages/cart";
+@use "pages/profile";
+@use "pages/category";
+@use "pages/admin";
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0; 
+  background-color: variables.$background-color;
+}
+
+main {
+  flex-grow: 1;
+  padding: 5rem 0;
+}
+
+section:not(.--ignore-padding, .--first) {
+  padding: 14rem 4rem 0 4rem;
+}
+
+:is(.--ignore-padding) {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+:is(.--first) {
+  padding: 0 4rem;
+}
+
+.clickable {
+  cursor: pointer;
+}

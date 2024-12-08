@@ -1,0 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Parkinsans:wght@300..800&display=swap");
+
+$font: "Figtree", sans-serif;
+$primary-heading-font: "Parkinsans", san-serif;
+$secondary-heading-font: "Libre Baskerville", serif;
+
+$font-light: 300;
+$font-regular: 400;
+$font-medium: 500;
+$font-bold: 700;
+$font-extra-bold: 900;
+
+$font-size-base: 1rem; // 16px
+$font-size-sm: 0.875rem; // 14px
+$font-size-lg: 1.25rem; // 20px
+$font-size-xl: 2rem; // 32px
+
+$fast-trans: 300ms cubic-bezier(0, -0.01, 0.38, 1);
+$bounce-bezier: cubic-bezier(.57,-0.37,.28,1.2);
+
+$line-height-base: 1.5;
+$line-height-heading: 1.2;
+
+$primary-color: #141414;
+$heading-color: #222222;
+$text-color: #555555;
+$background-color: #fffefe;
+
+$white-color: #fffdfa;
+$light-gray-color: #ececec;
+$light-gray-color-100: #dfdfdf;
+$light-gray-color-200: #b9b9b9;
+$dark-gray-color: #353535;
+
+$primary-button-color: #ff6a2f;
+$primary-button-color-hovered: #d76031;
+
+$small-radius: 5px;
+$medium-radius: 10px;
+$large-radius: 15px;
+
+$default-border: 1px solid #a5a5a5;
+$image-border: 1px solid rgba(0, 0, 0, 0.068);
+
+$small-box-shadow: -1px 2px 23px -7px rgba(0,0,0,0.26);

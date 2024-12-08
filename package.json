@@ -1,0 +1,25 @@
+{
+  "name": "shopease",
+  "version": "1.0.0",
+  "main": "index.php",
+  "scripts": {
+    "start": "concurrently \"npm run scss\" \"npm run browsersync\"",
+    "scss": "sass --watch scss:css",
+    "browsersync": "browser-sync start --config bs-config.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.47.2",
+    "nodemon": "^3.1.7",
+    "shopease": "file:"
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.3",
+    "concurrently": "^9.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "sass": "^1.81.1"
+  }
+}

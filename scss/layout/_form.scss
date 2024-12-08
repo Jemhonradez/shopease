@@ -1,0 +1,63 @@
+@use "../base/variables" as vars;
+
+.form-container {
+  display: grid;
+  width: 25rem;
+  gap: 0.5rem;
+
+  .submit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .form-item {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      max-height: 200px;
+      resize: vertical;
+    }
+
+    textarea, input {
+      color: vars.$heading-color;
+      border: vars.$default-border;
+      border-radius: vars.$medium-radius;
+      padding: 0.4rem;
+      outline: none;
+
+      &:hover {
+        border: 1px solid vars.$heading-color;
+      }
+
+      &:focus {
+        outline: 0.5px solid vars.$heading-color;
+      }
+    }
+
+    select,
+    option {
+      color: vars.$heading-color;
+      border: vars.$default-border;
+      border-radius: vars.$medium-radius;
+      padding: 0.5rem;
+      outline: none;
+
+      &:focus {
+        outline: 0.5px solid vars.$heading-color;
+      }
+    }
+  }
+
+  .line {
+    background-color: vars.$light-gray-color;
+    margin: 0.5rem 0;
+  }
+}

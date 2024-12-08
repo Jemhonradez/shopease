@@ -1,0 +1,11 @@
+@use '../base/variables' as vars;
+
+.card {
+  border: vars.$default-border;
+  border-radius: vars.$small-radius;
+  padding: 1rem;
+
+  * {
+    margin: 0;
+  }
+}

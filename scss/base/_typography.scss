@@ -1,0 +1,49 @@
+@use "variables" as vars;
+
+body {
+  color: vars.$text-color;
+  font-family: vars.$font;
+  font-size: vars.$font-size-base;
+  line-height: vars.$line-height-base;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0 0 1rem 0;
+  font-weight: vars.$font-bold;
+  line-height: vars.$line-height-heading;
+  color: vars.$heading-color;
+}
+
+h1 {
+  font-family: vars.$primary-heading-font;
+  font-size: vars.$font-size-xl;
+}
+
+h2 {
+  font-family: vars.$secondary-heading-font;
+  font-size: 1.75rem; // 28px
+}
+
+h3 {
+  font-family: vars.$primary-heading-font;
+  font-size: 1.5rem; // 24px
+}
+
+p {
+  font-size: vars.$font-size-base;
+  line-height: vars.$line-height-base;
+  margin-bottom: 1rem;
+}
+
+a {
+  font-family: vars.$font;
+  font-weight: vars.$font-medium;
+  text-decoration: none;
+  color: inherit;
+}

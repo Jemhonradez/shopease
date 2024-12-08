@@ -1,0 +1,30 @@
+@use "../base/variables" as vars;
+
+.profile-wrapper {
+  display: grid;
+  gap: 2rem;
+
+  .title {
+    font-size: 2.5rem;
+  }
+
+  .clickable {
+    text-decoration: underline;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1rem;
+
+    .item {
+      .title {
+        font-size: 0.9rem;
+      }
+      .desc {
+        color: vars.$heading-color;
+      }
+    }
+  }
+}

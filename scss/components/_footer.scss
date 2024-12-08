@@ -1,0 +1,31 @@
+@use "../base/variables" as vars;
+
+.footer {
+  padding: 2rem 4rem 1rem 4rem;
+  background-color: vars.$light-gray-color;
+  
+  .container {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    width: 100%;
+
+    .footer-main {
+      width: 25rem;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+    }
+
+    ul {
+      display: grid;
+      gap: 0.5rem;
+    }
+  }
+
+  .footer-side {
+    display: flex;
+    gap: 5rem;
+  }
+}

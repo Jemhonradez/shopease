@@ -1,0 +1,22 @@
+@use "../base/variables" as vars;
+
+.space-btwn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.flex-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

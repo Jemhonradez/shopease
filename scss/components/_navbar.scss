@@ -1,0 +1,76 @@
+@use "../base/variables" as vars;
+
+.navbar {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0.9rem 4rem;
+  color: vars.$heading-color;
+  z-index: 100;
+  transition: vars.$fast-trans;
+  background-color: vars.$white-color;
+  top: 0;
+
+  &.hidden {
+    transition: vars.$fast-trans;
+    top: -10%;
+  }
+
+  &.scrolled {
+    border-bottom: vars.$default-border;
+  }
+
+  .container {
+    position: relative;
+    padding: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    .nav-links {
+      position: absolute;
+      display: flex;
+      gap: 40px;
+      left: 0;
+
+      .nav-link a {
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+    }
+
+    .logo {
+      position: absolute;
+      text-align: center;
+      left: 50%;
+      transform: translateX(-50%);
+
+      h3 {
+        margin: 0;
+      }
+    }
+
+    .quick-links {
+      position: absolute;
+      display: flex;
+      gap: 15px;
+      right: 0;
+
+      .ti {
+        font-size: 1.5rem;
+        // color: vars.$white-color;
+      }
+
+      .quick-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+      }
+    }
+  }
+}

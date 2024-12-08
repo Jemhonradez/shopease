@@ -1,0 +1,25 @@
+/vendor/
+node_modules/
+
+.DS_Store           # macOS
+Thumbs.db           # Windows
+
+.vscode/
+.idea/
+
+.env
+.env.local
+config.php
+
+
+/css/
+/js/
+
+*.phar
+*.class.php
+
+*.log
+
+*.sess
+
+*~

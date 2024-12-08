@@ -1,0 +1,14 @@
+@use "../base/variables" as vars;
+
+.line {
+  height: 1px;
+  width: 100%;
+  background-color: vars.$light-gray-color;
+}
+
+.vertical-line {
+  display: block;
+  height: 38px;
+  width: 2px;
+  background-color: vars.$light-gray-color;
+}
