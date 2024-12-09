@@ -33,15 +33,11 @@ button {
   transition: vars.$fast-trans;
 }
 
-.icon-cta-btn {
+.primary-cta-btn,
+.secondary-cta-btn {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 7px;
-}
-
-.primary-cta-btn,
-.secondary-cta-btn {
   padding: 0.5rem 1.2rem;
   border-radius: vars.$medium-radius;
   width: max-content;

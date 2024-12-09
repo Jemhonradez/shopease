@@ -103,7 +103,7 @@ async function loadProducts() {
         <p>P${parseFloat(item.item_price).toFixed(2)}</p>
         <p>${new Date(item.created_at).toLocaleDateString()}</p>
         <button type="button" class="action-btn">
-          <i class="ti ti-dots-vertical"></i>
+          <i class="ti ti-trash "></i>
         </button>
       `;
 

@@ -51,6 +51,10 @@ session_start();
           <p class="desc" name="name">Loading...</p>
         </div>
         <div class="item">
+          <p class="title">Balance</p>
+          <p class="desc" name="balance">Loading...</p>
+        </div>
+        <div class="item">
           <p class="title">Username</p>
           <p class="desc" name="username">Loading...</p>
         </div>

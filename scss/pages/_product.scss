@@ -1,0 +1,19 @@
+@use "../base/variables" as vars;
+
+.product-container {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 3rem;
+
+  .product-image {
+    width: 100%;
+    height: 700px;
+    background-color: vars.$light-gray-color-200;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+}

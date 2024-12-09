@@ -33,7 +33,6 @@ switch ($request) {
   case '/category/men':
     include 'pages/category/men.php';
     break;
-
   case '/admin':
     include 'pages/admin/admin.php';
     break;
@@ -42,8 +41,17 @@ switch ($request) {
     include 'pages/admin/product-management.php';
     break;
 
-  default:
-    include 'pages/404.php';
+  case '/payment':
+    include 'pages/payment.php';
+    break;
+
+    default:
+    if (preg_match('#^/category/(women|men)/product.php$#', $request, $matches)) {
+        $category = $matches[1];
+        include "pages/category/product.php";
+    } else {
+        include 'pages/404.php';
+    }
     break;
 }
 

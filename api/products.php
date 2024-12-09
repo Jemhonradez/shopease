@@ -3,14 +3,33 @@
 require_once "../config/db.php";
 
 if ($_SERVER['REQUEST_METHOD'] === "GET") {
-  try {
-    $sql = "SELECT * FROM items ORDER BY created_at DESC";
-    $stmt = $pdo->query($sql);
-    $items = $stmt->fetchAll();
+  if (isset($_GET['item_id'])) {
+    try {
+      $item_id = intval($_GET['item_id']);
+      $sql = "SELECT * FROM items WHERE item_id = :item_id";
+      $stmt = $pdo->prepare($sql);
+      $stmt->bindParam(":item_id", $item_id, PDO::PARAM_INT);
+      $stmt->execute();
+      $item = $stmt->fetch();
 
-    echo json_encode(["items" => $items]);
-  } catch (PDOException $e) {
-    echo json_encode(["error" => "Error:" . $e->getMessage()]);
+      if ($item) {
+        echo json_encode($item);
+      } else {
+        echo json_encode(["error" => "Item not found"]);
+      }
+    } catch (PDOException $e) {
+      echo json_encode(["error" => "Database error: " . $e->getMessage()]);
+    }
+  } else {
+    try {
+      $sql = "SELECT * FROM items ORDER BY created_at DESC";
+      $stmt = $pdo->query($sql);
+      $items = $stmt->fetchAll();
+
+      echo json_encode(["items" => $items]);
+    } catch (PDOException $e) {
+      echo json_encode(["error" => "Error: " . $e->getMessage()]);
+    }
   }
 }
 

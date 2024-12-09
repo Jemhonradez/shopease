@@ -81,7 +81,7 @@
           <h3>WOMEN</h3>
           <p>From elegant dresses to cute tops- find your style.</p>
           <button type="button" class="secondary-cta-btn">
-            <a href="/categories/women">Shop womens</a>
+            <a href="/category/women">Shop womens</a>
           </button>
         </div>
       </div>
@@ -91,7 +91,7 @@
           <h3>MEN</h3>
           <p>From elegant dresses to cute tops- find your style.</p>
           <button type="button" class="secondary-cta-btn">
-            <a href="/categories/men">Shop mens</a>
+            <a href="/category/men">Shop mens</a>
           </button>
         </div>
       </div>

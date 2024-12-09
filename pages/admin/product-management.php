@@ -1,4 +1,5 @@
 <main id="product-mngmt">
+  
   <div class="create-product card">
     <h3>Add a product</h3>
     <form class="form-container" id="createForm">
@@ -29,6 +30,7 @@
       </div>
     </form>
   </div>
+
   <section class="section-nav --first">
     <a href="/admin" class="flex-row align-center"><i class="ti ti-arrow-left"></i> Back to dashboard</a>
     <h2>Products</h2>

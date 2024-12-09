@@ -9,6 +9,18 @@ document.addEventListener("DOMContentLoaded", () => {
     script.src = "/assets/js/pages/auth.js";
     document.body.appendChild(script);
   }
+
+  if (window.location.pathname.includes("/category")) {
+    const script = document.createElement("script");
+    script.src = "/assets/js/pages/category.js";
+    document.body.appendChild(script);
+  }
+
+  if (window.location.pathname.includes("/admin")) {
+    const script = document.createElement("script");
+    script.src = "/assets/js/pages/admin.js";
+    document.body.appendChild(script);
+  }
 });
 
 async function uploadFile(file) {
@@ -81,3 +93,4 @@ async function putData(filepath, data) {
   });
   return await response.json();
 }
+

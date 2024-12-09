@@ -20,6 +20,7 @@ function loadProfileData() {
       document.querySelector('.desc[name="username"]').textContent = user.username;
       document.querySelector('.desc[name="contact_no"]').textContent = user.contact_no;
       document.querySelector('.desc[name="address"]').textContent = user.address;
+      document.querySelector('.desc[name="balance"]').textContent = `P${user.balance}`;
 
       document.querySelector('input[name="name"]').value = user.name;
       document.querySelector('input[name="username"]').value = user.username;
@@ -28,7 +29,6 @@ function loadProfileData() {
     })
     .catch((error) => {
       console.error("Error fetching profile data:", error);
-      alert("There was an error loading your profile data");
     });
 }
 

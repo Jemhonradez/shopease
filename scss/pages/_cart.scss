@@ -1,2 +1,73 @@
 @use "../base/variables" as vars;
 
+#cart {
+  .container {
+    display: grid;
+    gap: 1rem;
+  }
+}
+
+.total-container {
+  width: 30rem;
+  border: 1px solid vars.$light-gray-color;
+  border-radius: vars.$small-radius;
+  padding: 10px;
+  justify-self: end;
+  h4, p {
+    margin: 0;
+  }
+}
+
+.cart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-radius: 8px;
+
+  p {
+    font-size: 1.1em;
+    color: #777;
+    text-align: center;
+    margin-top: 20px;
+  }
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background-color: #fff;
+  border: 1px solid vars.$light-gray-color-200;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+
+  .order-item-image {
+    img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+  }
+
+  .order-item-info {
+    display: flex;
+    align-items: start;
+    flex-direction: column;
+
+    h4, p {
+      margin: 0;  
+    }
+
+    h4 {
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+    p {
+      font-size: 1em;
+      color: vars.$primary-color;
+    }
+  }
+}

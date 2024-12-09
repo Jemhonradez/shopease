@@ -1,3 +1,17 @@
+.loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+
+  .loader {
+    height: 30px;
+    width: 30px;
+    border: 5px solid #d8d8d8;
+    border-bottom-color: #a4a4a4;
+  }
+}
+
 .loader {
   position: relative;
   width: 16px;
