@@ -52,3 +52,13 @@ section:not(.--ignore-padding, .--first) {
 .clickable {
   cursor: pointer;
 }
+
+.tab-menu {
+  gap: 20px;
+
+  .vertical-line {
+    width: 1.8px;
+    height: 80%;
+    background-color: variables.$text-color;
+  }
+}

@@ -7,6 +7,9 @@
   }
 
   .sub-categories {
+    display: flex;
+    gap: 0.3rem;
+
     .filter-btn {
       color: vars.$heading-color;
       border: 1px solid vars.$heading-color;
@@ -45,13 +48,18 @@
       }
 
       .item-info {
+        display: grid;
+        gap: 5px;
+
         .title {
-          font-size: 1.2rem;
+          text-transform: uppercase;
+          font-weight: 400;
+          font-size: 1;
           margin: 0;
         }
 
-        .desc {
-          font-size: 1.1rem;
+        .price {
+          font-size: 1;
         }
       }
     }

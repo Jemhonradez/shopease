@@ -94,3 +94,11 @@ async function putData(filepath, data) {
   return await response.json();
 }
 
+function formatCurrency(number) {
+  const formattedNumber = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "PHP",
+  }).format(number);
+
+  return formattedNumber;
+}

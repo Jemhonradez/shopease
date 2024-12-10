@@ -20,7 +20,9 @@ function loadProfileData() {
       document.querySelector('.desc[name="username"]').textContent = user.username;
       document.querySelector('.desc[name="contact_no"]').textContent = user.contact_no;
       document.querySelector('.desc[name="address"]').textContent = user.address;
-      document.querySelector('.desc[name="balance"]').textContent = `P${user.balance}`;
+      document.querySelector('.desc[name="balance"]').textContent = formatCurrency(
+        user.balance
+      );
 
       document.querySelector('input[name="name"]').value = user.name;
       document.querySelector('input[name="username"]').value = user.username;
@@ -71,11 +73,12 @@ document.getElementById("editForm").addEventListener("submit", function (e) {
       } else if (result.message) {
         alert(result.message);
         setTimeout(() => {
-          location.reload()
+          location.reload();
         }, 500);
       }
     })
     .catch((error) => {
-      alert(error.message );
+      alert(error.message);
     });
 });
+

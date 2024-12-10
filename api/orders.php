@@ -10,9 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $user_id = $_GET['user_id'];
 
     try {
-        // Fetch all orders for the given user_id, joining with the items table to include item details (like item_image)
+        // Fetch all orders for the given user_id, joining with the items table to include item details (like item_image) and the order status
         $sql = "
-            SELECT orders.order_id, orders.item_id, orders.item_qty, items.item_name, items.item_image, items.item_price
+            SELECT orders.order_id, orders.item_id, orders.item_qty, orders.order_status, items.item_name, items.item_image, items.item_price
             FROM orders
             JOIN items ON orders.item_id = items.item_id
             WHERE orders.user_id = :user_id
@@ -48,15 +48,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $data['user_id'];
     $item_price = intval($data['item_price']);
     $item_qty = intval($data['item_qty']);
+    $order_status = 'processing'; // Default status
 
     try {
         // Insert the order into the orders table
-        $sql = "INSERT INTO orders (item_price, item_id, user_id, item_qty) VALUES (:item_price, :item_id, :user_id, :item_qty)";
+        $sql = "INSERT INTO orders (item_price, item_id, user_id, item_qty, order_status) 
+                VALUES (:item_price, :item_id, :user_id, :item_qty, :order_status)";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':item_price', $item_price);
         $stmt->bindParam(':item_id', $item_id);
         $stmt->bindParam(':user_id', $user_id);
         $stmt->bindParam(':item_qty', $item_qty);
+        $stmt->bindParam(':order_status', $order_status);
 
         if ($stmt->execute()) {
             echo json_encode(["success" => "Item added to cart"]);

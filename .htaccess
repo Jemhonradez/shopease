@@ -1,10 +1,10 @@
 RewriteEngine On
 
 # Define the base directory for URL rewriting
-RewriteBase /shopease/
+RewriteBase /
 
 # Redirect URLs starting with /shopease to the root (localhost)
-RewriteCond %{REQUEST_URI} ^/shopease
+RewriteCond %{REQUEST_URI} ^/
 RewriteRule ^shopease/(.*)$ /$1 [L,R=301]
 
 # Handle all other URLs and route them to index.php

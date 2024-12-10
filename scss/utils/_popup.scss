@@ -1,6 +1,6 @@
 @use "../base/variables" as vars;
 
-.edit-details, .create-product {
+.action-popup, .edit-details, .create-product, .popup {
   position: fixed;
   display: grid;
   visibility: hidden;
@@ -22,4 +22,9 @@
     opacity: 1;
     transform: scale(1) translate(-50%, -50%);
   }
+} 
+
+.action-popup {
+  gap: 5px;
+  padding: 0.5rem;
 }

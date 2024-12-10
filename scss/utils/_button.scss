@@ -63,3 +63,33 @@ button {
     transform: scale(0.99);
   }
 }
+
+.action-cta-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 7px 12px;
+  transition: vars.$fast-trans;
+  border-radius: vars.$small-radius;
+
+  .ti {
+    font-size: 1.2rem;
+  }
+
+  &:hover {
+    background-color: vars.$light-gray-color;
+  }
+}
+
+.delete-btn {
+  background-color: #d62121;
+  color: vars.$white-color;
+
+  .ti {
+    color: vars.$white-color;
+  }
+
+  &:hover {
+    background-color: #8d1c1c;
+  }
+}

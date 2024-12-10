@@ -80,7 +80,7 @@
     .table-item {
       display: grid;
       align-items: center;
-      grid-template-columns: 50px 500px 1fr 200px 200px 50px;
+      grid-template-columns: 50px 250px 150px 1fr 400px 150px 50px;
     }
 
     .table-header {
@@ -94,6 +94,11 @@
         color: vars.$dark-gray-color;
         margin: 0;
       }
+    }
+
+    .no-products-message {
+      justify-self: center;
+      margin: 1rem 0;
     }
 
     .table-item:not(:last-of-type) {

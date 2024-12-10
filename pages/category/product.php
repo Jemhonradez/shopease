@@ -5,7 +5,7 @@ session_start();
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 ?>
 
-<main>
+<main id="product">
   <section class="section-nav --first">
     <p class="clickable flex-row align-center" onclick="window.history.back();"><i class="ti ti-arrow-left"></i> Back to products</p>
   </section>
@@ -15,9 +15,7 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 <script>
   const userId = <?php echo json_encode($user_id); ?>;
-</script>
 
-<script>
   async function loadProduct() {
     const urlParams = new URLSearchParams(window.location.search);
     const itemId = urlParams.get("item_id");
@@ -41,7 +39,7 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
         <div class="product-info">
             <h1>${product.item_name}</h1>
             <p>${product.item_desc}</p>
-            <h4>P${parseFloat(product.item_price).toFixed(2)}</h4>
+            <h4>${formatCurrency(product.item_price)}</h4>
             <p>Stock: ${product.item_stock}</p>
             <div class="quantity-input-container">
                 <label for="quantity">Quantity:</label>
@@ -108,4 +106,8 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
       inputElement.value = maxStock;
     }
   }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadProduct();
+  })
 </script>

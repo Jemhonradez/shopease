@@ -1,10 +1,8 @@
 <main id="category">
   <section class="container --first">
-    <div>
-      <div class="section-info">
-        <h2>Men Collection</h2>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum quam porro aliquam facere nobis a minima vero dignissimos amet quibusdam?</p>
-      </div>
+    <div class="section-info">
+      <h2>Men Collection</h2>
+      <p> Discover our stylish and versatile men's collection, featuring everything from casual wear to formal attire. Find the prfect pieces for any occasion, crafted for comfort and durability. Upgrade your wardrobe today!
       <div class="sub-categories">
         <button type="button" class="primary-cta-btn filter-btn base-btn">
           Top

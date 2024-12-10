@@ -5,6 +5,7 @@ if (!isset($_SESSION['user_id'])) {
   header('Location: /login');
   exit();
 }
+
 $user_id = $_SESSION['user_id'];
 ?>
 
@@ -30,6 +31,14 @@ $user_id = $_SESSION['user_id'];
   const payBtn = document.getElementById("payBtn");
   const clearBtn = document.getElementById("clearBtn");
 
+  function formatCurrency(number) {
+    const formattedNumber = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "PHP",
+    }).format(number);
+
+    return formattedNumber;
+  }
 
   async function loadBalance(userId) {
     const balanceElement = document.getElementById("balance");
@@ -38,11 +47,15 @@ $user_id = $_SESSION['user_id'];
       const response = await fetch(`/assets/js/utils/balance.php`);
       const data = await response.json();
 
-      if (data.error) {
-        console.error(data.error);
-        balanceElement.textContent = "Error loading balance";
+      if (Array.isArray(data) && data[0]?.balance) {
+        // If response is an array with a balance key
+        balanceElement.textContent = formatCurrency(data[0].balance);
+      } else if (data.balance) {
+        // If response has a balance key directly
+        balanceElement.textContent = formatCurrency(data.balance);
       } else {
-        balanceElement.textContent = `P${Number(data.balance).toFixed(2)}`;
+        console.error("Unexpected balance response format:", data);
+        balanceElement.textContent = "Error loading balance";
       }
     } catch (error) {
       console.error("Error loading balance:", error);
@@ -78,38 +91,46 @@ $user_id = $_SESSION['user_id'];
 
       let totalAmount = 0;
 
-      if (data.orders.length > 0) {
-        data.orders.forEach(order => {
-          const orderTotal = order.item_price * order.item_qty;
-          totalAmount += orderTotal;
+      const orders = Array.isArray(data.orders) ? data.orders : [];
+      if (orders.length > 0) {
+        // Filter out orders with status "pending" or "complete"
+        const filteredOrders = orders.filter(order => order.order_status === 'processing');
 
-          const orderElement = document.createElement("div");
-          orderElement.classList.add("order-item");
+        if (filteredOrders.length > 0) {
+          filteredOrders.forEach(order => {
+            const orderTotal = order.item_price * order.item_qty;
+            totalAmount += orderTotal;
 
-          orderElement.dataset.orderId = order.order_id;
+            const orderElement = document.createElement("div");
+            orderElement.classList.add("order-item");
 
-          orderElement.innerHTML = `
-          <div class="order-item-image">
-            <img src="${order.item_image}" alt="${order.item_name}" />
-          </div>
-          <div class="order-item-info">
-            <h4>${order.item_name}</h4>
-            <p>Quantity: ${order.item_qty}</p>
-            <p>Price: P${orderTotal.toFixed(2)}</p>
-          </div>
-        `;
+            orderElement.dataset.orderId = order.order_id;
 
-          ordersContainer.appendChild(orderElement);
-        });
+            orderElement.innerHTML = `
+                        <div class="order-item-image">
+                            <img src="${order.item_image}" alt="${order.item_name}" />
+                        </div>
+                        <div class="order-item-info">
+                            <h4>${order.item_name}</h4>
+                            <p>Quantity: ${order.item_qty}</p>
+                            <p>Price: ${formatCurrency(orderTotal)}</p>
+                        </div>
+                    `;
+
+            ordersContainer.appendChild(orderElement);
+          });
+        } else {
+          ordersContainer.innerHTML = "<p>No orders found.</p>";
+        }
       } else {
         ordersContainer.innerHTML = "<p>No orders found.</p>";
       }
 
-      totalPriceElement.textContent = `P${totalAmount.toFixed(2)}`;
+      totalPriceElement.textContent = formatCurrency(totalAmount);
 
     } catch (error) {
       console.error("Error loading orders:", error);
-      ordersContainer.innerHTML = "<p>No orders found.</p>";
+      ordersContainer.innerHTML = "<p>Error loading orders.</p>";
     }
   }
 
@@ -120,16 +141,12 @@ $user_id = $_SESSION['user_id'];
 
     const loader = document.createElement("span");
     loader.className = "loader";
-    const loaderContainer = document.createElement("div");
-    loaderContainer.className = "loader-container";
-    loaderContainer.appendChild(loader);
-
-    clearBtn.appendChild(loaderContainer);
+    clearBtn.appendChild(loader);
     clearBtn.disabled = true;
 
     if (orderItems.length === 0) {
       alert("The cart is already empty.");
-      loaderContainer.remove();
+      loader.remove();
       clearBtn.disabled = false;
       return;
     }
@@ -148,17 +165,17 @@ $user_id = $_SESSION['user_id'];
       const result = await response.json();
       if (result.error) {
         console.error("Error clearing cart:", result.error);
-        loaderContainer.remove();
+        loader.remove();
       } else {
         console.log("All items cleared from cart.");
-        totalAmountElement.textContent = `P0.00`;
+        totalAmountElement.textContent = formatCurrency(0);
         loadCart(userId);
         loadBalance(userId);
       }
     } catch (error) {
       console.error("Error clearing cart:", error);
     } finally {
-      loaderContainer.remove(); // Ensure loader is removed after process
+      loader.remove(); // Ensure loader is removed after process
       clearBtn.disabled = false;
     }
   }
@@ -169,16 +186,12 @@ $user_id = $_SESSION['user_id'];
 
     const loader = document.createElement("span");
     loader.className = "loader";
-    const loaderContainer = document.createElement("div");
-    loaderContainer.className = "loader-container";
-    loaderContainer.appendChild(loader);
-
-    payBtn.appendChild(loaderContainer);
+    payBtn.appendChild(loader);
     payBtn.disabled = true;
 
     if (totalAmount <= 0) {
       alert("Cart is empty or total amount is invalid.");
-      loaderContainer.remove();
+      loader.remove();
       payBtn.disabled = false;
       return;
     }
@@ -188,13 +201,13 @@ $user_id = $_SESSION['user_id'];
 
     if (orderIds.length === 0) {
       alert("No items in the cart to checkout.");
-      loaderContainer.remove();
+      loader.remove();
       payBtn.disabled = false;
       return;
     }
 
     try {
-      const response = await fetch("/api/checkout.php", {
+      const response = await fetch("/api/payments.php", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -207,11 +220,11 @@ $user_id = $_SESSION['user_id'];
       const result = await response.json();
 
       if (result.error) {
-        loaderContainer.remove();
+        loader.remove();
         alert(result.error);
       } else {
         alert(result.success);
-        totalAmountElement.textContent = `P0.00`;
+        totalAmountElement.textContent = formatCurrency(0);
         loadCart(userId);
         loadBalance(userId);
       }
@@ -219,7 +232,7 @@ $user_id = $_SESSION['user_id'];
       console.error("Error during checkout:", error);
       alert("An error occurred. Please try again later.");
     } finally {
-      loaderContainer.remove(); // Ensure loader is removed after process
+      loader.remove();
       payBtn.disabled = false;
     }
   }

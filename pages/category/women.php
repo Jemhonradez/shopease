@@ -3,7 +3,7 @@
     <div>
       <div class="section-info">
         <h2>Women Collection</h2>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum quam porro aliquam facere nobis a minima vero dignissimos amet quibusdam?</p>
+        <p>Welcome the essence of style and elegance with our curated selection designed just for you. From timeless classics to trendy pieces,  find the perfect outfits and accessories that empower your individuality. Embrace your unique style and shop the latest fashion trends tailored to every occasion. Happy Shopping!</p>
       </div>
       <div class="sub-categories">
         <button type="button" class="primary-cta-btn filter-btn base-btn">

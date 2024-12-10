@@ -1,5 +1,10 @@
 <main id="product-mngmt">
-  
+  <div class="action-popup card">
+  </div>
+
+  <div class="action-popup-edit popup card"></div>
+  <div class="action-popup-delete popup card"></div>
+
   <div class="create-product card">
     <h3>Add a product</h3>
     <form class="form-container" id="createForm">
@@ -46,8 +51,9 @@
       <div class="table-header">
         <h4>Id</h4>
         <h4>Name</h4>
-        <h4>Description</h4>
         <h4>Price</h4>
+        <h4>Description</h4>
+        <h4>Tags</h4>
         <h4>Added on</h4>
       </div>
       <div class="table-content">
