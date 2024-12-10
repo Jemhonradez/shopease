@@ -3,10 +3,8 @@
 session_start();
 require_once "../config/db.php";
 
-// Handle different request methods
-$method = $_SERVER['REQUEST_METHOD'];
 
-if ($method == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Check if the user is authenticated
   if (!isset($_SESSION['user_id'])) {
     echo json_encode(["error" => "User not authenticated."]);
@@ -42,10 +40,11 @@ if ($method == 'POST') {
 
     $balance = $user['balance'];
     $totalAmount = 0;
+    $orderDetails = [];
 
     foreach ($order_ids as $order_id) {
       // Fetch order details
-      $stmt = $pdo->prepare("SELECT order_id, item_id, item_price, item_qty, order_status FROM orders 
+      $stmt = $pdo->prepare("SELECT order_id, item_id, item_price, item_qty, order_status, item_name FROM orders 
                             WHERE user_id = :user_id AND order_id = :order_id");
       $stmt->bindParam(':user_id', $user_id);
       $stmt->bindParam(':order_id', $order_id);
@@ -96,8 +95,16 @@ if ($method == 'POST') {
       $stmt->bindParam(':user_id', $user_id);
       $stmt->bindParam(':order_id', $order_id);
       $stmt->execute();
-    }
 
+      // Collect order details for response
+      $orderDetails[] = [
+        "order_id" => $order_id,
+        "item_name" => $order['item_name'],
+        "item_qty" => $order['item_qty'],
+        "status" => 'pending',
+        "total_amount" => $orderTotal
+      ];
+    }
 
     // Update user's balance
     $stmt = $pdo->prepare("UPDATE users SET balance = :balance WHERE user_id = :user_id");
@@ -110,7 +117,7 @@ if ($method == 'POST') {
 
     echo json_encode([
       "success" => "Checkout completed successfully.",
-      "total_amount" => $totalAmount,
+      "orders" => $orderDetails,
       "remaining_balance" => $balance
     ]);
   } catch (PDOException $e) {
@@ -123,9 +130,10 @@ if ($method == 'POST') {
 }
 
 
-// Read payments (GET)
-elseif ($method == 'GET') {
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $payments = [];
+
+  // Check if user_id or order_id is provided in the query
   if (isset($_GET['user_id'])) {
     $user_id = $_GET['user_id'];
 
@@ -136,7 +144,7 @@ elseif ($method == 'GET') {
       $stmt->execute();
 
       $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      echo json_encode($payments);
+      echo json_encode(["payments" => $payments]);
     } catch (PDOException $e) {
       echo json_encode(["error" => "Error: " . $e->getMessage()]);
     }
@@ -150,17 +158,27 @@ elseif ($method == 'GET') {
       $stmt->execute();
 
       $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      echo json_encode($payments);
+      echo json_encode(["payments" => $payments]);
     } catch (PDOException $e) {
       echo json_encode(["error" => "Error: " . $e->getMessage()]);
     }
   } else {
-    echo json_encode(["message" => "No user_id or order_id provided"]);
+    // If neither user_id nor order_id is provided, fetch all payments
+    try {
+      $query = "SELECT * FROM payments ORDER BY payment_date DESC";
+      $stmt = $pdo->prepare($query);
+      $stmt->execute();
+
+      $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      echo json_encode(["payments" => $payments]);
+    } catch (PDOException $e) {
+      echo json_encode(["error" => "Error: " . $e->getMessage()]);
+    }
   }
 }
 
 // Update payment status (PUT)
-elseif ($method == 'PUT') {
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
   parse_str(file_get_contents("php://input"), $put_vars);
 
   if (isset($put_vars['payment_id'], $put_vars['payment_status'])) {
@@ -184,7 +202,7 @@ elseif ($method == 'PUT') {
 }
 
 // Delete a payment (DELETE)
-elseif ($method == 'DELETE') {
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
   parse_str(file_get_contents("php://input"), $delete_vars);
 
   if (isset($delete_vars['payment_id'])) {
@@ -203,6 +221,4 @@ elseif ($method == 'DELETE') {
   } else {
     echo json_encode(["error" => "Payment ID missing"]);
   }
-} else {
-  echo json_encode(["message" => "Invalid request method"]);
 }

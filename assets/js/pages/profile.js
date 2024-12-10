@@ -6,6 +6,17 @@ function profileInit() {
 let user;
 
 function loadProfileData() {
+  const accountDetails = document.getElementById("account-card");
+
+  const loaderDiv = document.createElement("div");
+  loaderDiv.className = "loader-container";
+  const loader = document.createElement("span");
+  loader.className = "loader";
+
+  accountDetails.innerHTML = "";
+  accountDetails.appendChild(loaderDiv);
+  loaderDiv.appendChild(loader);
+
   fetch("../api/getUserData.php")
     .then((response) => response.json())
     .then((data) => {
@@ -16,13 +27,38 @@ function loadProfileData() {
 
       user = data.user;
 
-      document.querySelector('.desc[name="name"]').textContent = user.name;
-      document.querySelector('.desc[name="username"]').textContent = user.username;
-      document.querySelector('.desc[name="contact_no"]').textContent = user.contact_no;
-      document.querySelector('.desc[name="address"]').textContent = user.address;
-      document.querySelector('.desc[name="balance"]').textContent = formatCurrency(
-        user.balance
-      );
+      loaderDiv.remove();
+
+      accountDetails.innerHTML = `
+        <div class="space-btwn">
+          <h4>Profile & Security</h4>
+          <p class="clickable" onclick="showPopup()">Edit</p>
+        </div>
+        <div class="item">
+          <p class="title">Full Name</p>
+          <p class="desc">${user.name}</p>
+        </div>
+        <div class="item">
+          <p class="title">Balance</p>
+          <p class="desc">${formatCurrency(user.balance)}</p>
+        </div>
+        <div class="item">
+          <p class="title">Username</p>
+          <p class="desc">${user.username}</p>
+        </div>
+        <div class="item">
+          <p class="title">Phone number</p>
+          <p class="desc">${user.contact_no}</p>
+        </div>
+        <div class="item">
+          <p class="title">Address</p>
+          <p class="desc">${user.address}</p>
+        </div>
+        <div class="item">
+          <p class="title">Password</p>
+          <p class="desc">*********</p>
+        </div>
+      `;
 
       document.querySelector('input[name="name"]').value = user.name;
       document.querySelector('input[name="username"]').value = user.username;
@@ -40,6 +76,8 @@ function showPopup() {
   document.querySelector('input[name="username"]').value = user.username;
   document.querySelector('input[name="contact_no"]').value = user.contact_no;
   document.querySelector('input[name="address"]').value = user.address;
+  document.querySelector('input[name="currentPassword"]').value = ""
+  document.querySelector('input[name="password"]').value = ""
 
   const popup = document.querySelector(".edit-details");
   setTimeout(() => {
@@ -55,6 +93,13 @@ function showPopup() {
 document.getElementById("editForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
+  const submitBtn = document.querySelector("button[type='submit'");
+
+  const loader = document.createElement("span");
+  loader.className = "loader";
+  submitBtn.appendChild(loader);
+  submitBtn.disabled = true;
+
   const formData = new FormData(this);
 
   const data = {
@@ -62,12 +107,15 @@ document.getElementById("editForm").addEventListener("submit", function (e) {
     username: formData.get("username"),
     contact_no: formData.get("contact_no"),
     address: formData.get("address"),
+    currentPassword: formData.get("currentPassword"),
     password: formData.get("password"),
     user_id: formData.get("user_id"),
   };
 
   putData("/api/users.php", data)
     .then((result) => {
+      loader.remove();
+      submitBtn.disabled = false;
       if (result.error) {
         alert(result.error);
       } else if (result.message) {
@@ -81,4 +129,3 @@ document.getElementById("editForm").addEventListener("submit", function (e) {
       alert(error.message);
     });
 });
-

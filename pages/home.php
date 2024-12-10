@@ -7,19 +7,17 @@
   </section>
 
   <section class="featured-categories">
-
     <div class="section-info">
       <div>
         <h2 class="title">Featured Categories</h2>
         <p class="desc">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Exercitationem corrupti nisi explicabo dolorem reiciendis laboriosam debitis ad perferendis fugit quas!</p>
       </div>
       <button type="button" class="primary-cta-btn">
-        <a href="/categories">Explore more</a>
+        <a href="/category">Explore more</a>
       </button>
     </div>
 
     <div class="category-grid">
-
       <div class="category-item">
         <div class="category-image">
           <img style="object-position: center 25%;" src="assets/images/tops.jpg" alt="Tops">
@@ -27,7 +25,7 @@
         <div class="category-item-info">
           <h3>Tops</h3>
           <button type="button" class="secondary-cta-btn">
-            <a href="/categories/tops">Shop Now</a>
+            <a href="/category?tag=tops">Shop Now</a>
           </button>
         </div>
       </div>
@@ -39,7 +37,7 @@
         <div class="category-item-info">
           <h3>Bottoms</h3>
           <button type="button" class="secondary-cta-btn">
-            <a href="/categories/shoes">Shop Now</a>
+            <a href="/category?tag=bottoms">Shop Now</a>
           </button>
         </div>
       </div>
@@ -51,11 +49,10 @@
         <div class="category-item-info">
           <h3>Shoes</h3>
           <button type="button" class="secondary-cta-btn">
-            <a href="/categories/shoes">Shop Now</a>
+            <a href="/category?tag=shoes">Shop Now</a>
           </button>
         </div>
       </div>
-
     </div>
   </section>
 

@@ -28,36 +28,54 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
     exit();
   }
 }
-
 if ($_SERVER['REQUEST_METHOD'] === "PUT") {
   $data = json_decode(file_get_contents("php://input"), true);
 
   $user_id = $data["user_id"];
+  $currentPassword = isset($data["currentPassword"]) ? $data["currentPassword"] : null; // Check if currentPassword is set
 
-  $fieldsToUpdate = [];
-  $params = [];
+  // Fetch the user data from the database
+  $stmt = $pdo->prepare('SELECT * FROM users WHERE user_id = :user_id LIMIT 1');
+  $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+  $stmt->execute();
+  $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  foreach (["name", "username", "contact_no", "address", "password"] as $field) {
-    if (isset($data[$field]) && $data[$field] !== '') {
-      if ($field === "password") {
-        $data[$field] = password_hash($data[$field], PASSWORD_DEFAULT);
+  if ($user) {
+    // If currentPassword is provided, check if it's correct
+    if ($currentPassword !== "" && !password_verify($currentPassword, $user['password'])) {
+      echo json_encode(["error" => "Current password is incorrect."]);
+      exit();
+    }
+
+    $fieldsToUpdate = [];
+    $params = [];
+
+    // Loop through the fields to update
+    foreach (["name", "username", "contact_no", "address", "password"] as $field) {
+      if (isset($data[$field]) && $data[$field] !== '') {
+        if ($field === "password" && $data[$field] !== '') {
+          // Only hash the new password if it's being changed
+          $data[$field] = password_hash($data[$field], PASSWORD_DEFAULT);
+        }
+
+        $fieldsToUpdate[] = "$field = ?";
+        $params[] = $data[$field];
       }
-
-      $fieldsToUpdate[] = "$field = ?";
-      $params[] = $data[$field];
     }
-  }
 
-  if (!empty($fieldsToUpdate)) {
-    $sql = "UPDATE users SET " . implode(", ", $fieldsToUpdate) . " WHERE user_id = ?";
-    $params[] = $user_id;
+    if (!empty($fieldsToUpdate)) {
+      $sql = "UPDATE users SET " . implode(", ", $fieldsToUpdate) . " WHERE user_id = ?";
+      $params[] = $user_id;
 
-    $stmt = $pdo->prepare($sql);
+      $stmt = $pdo->prepare($sql);
 
-    if ($stmt->execute($params)) {
-      echo json_encode(["message" => "Successfully updated account."]);
-    } else {
-      echo json_encode(["error" => "An error occurred while updating your account."]);
+      if ($stmt->execute($params)) {
+        echo json_encode(["message" => "Successfully updated account."]);
+      } else {
+        echo json_encode(["error" => "An error occurred while updating your account."]);
+      }
     }
+  } else {
+    echo json_encode(["error" => "User not found."]);
   }
 }

@@ -33,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $_SESSION['user_id'] = $user['user_id'];
       $_SESSION['username'] = $user['username'];
       $_SESSION['user_type'] = $user['user_type'];
+      $_SESSION['balance'] = $user['balance'];
 
       echo json_encode(["message" => "Login successful", "user" => $user]);
     } else {

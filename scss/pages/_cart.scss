@@ -13,7 +13,8 @@
   border-radius: vars.$small-radius;
   padding: 10px;
   justify-self: end;
-  h4, p {
+  h4,
+  p {
     margin: 0;
   }
 }
@@ -56,8 +57,9 @@
     align-items: start;
     flex-direction: column;
 
-    h4, p {
-      margin: 0;  
+    h4,
+    p {
+      margin: 0;
     }
 
     h4 {
@@ -68,6 +70,42 @@
     p {
       font-size: 1em;
       color: vars.$primary-color;
+    }
+  }
+}
+
+.receipt-popup {
+  width: 20rem;
+
+  .order-details {
+    display: grid;
+    gap: 2px;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .receipt-title {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    gap: 1rem;
+
+    .receipt-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      height: 65px;
+      width: 65px;
+      border-radius: 50%;
+      background-color: vars.$primary-button-color;
+
+      .ti {
+        color: white;
+        font-size: 3rem;
+      }
     }
   }
 }

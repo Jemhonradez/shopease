@@ -16,6 +16,7 @@ $currentPage = preg_replace('/[^a-z0-9-_]/i', '', $currentPage);
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
   <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.18/dist/lenis.css">
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>

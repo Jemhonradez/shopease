@@ -3,7 +3,36 @@
 require_once "../config/db.php";
 
 if ($_SERVER['REQUEST_METHOD'] === "GET") {
-  if (isset($_GET['item_id'])) {
+  if (isset($_GET['category'])) {
+    $category = $_GET['category'];
+    $tags = isset($_GET['tags']) ? $_GET['tags'] : null; // Optional tags parameter
+
+    // Prepare the query with category and optional tags filter
+    $sql = "SELECT * FROM items WHERE category = :category";
+
+    // If tags are provided, add them to the SQL query
+    if ($tags) {
+      $sql .= " AND FIND_IN_SET(:tags, tags) > 0"; // Assuming tags are stored as comma-separated strings
+    }
+
+    $sql .= " ORDER BY created_at DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(":category", $category, PDO::PARAM_STR);
+
+    // Bind the tags parameter if it's present
+    if ($tags) {
+      $stmt->bindParam(":tags", $tags, PDO::PARAM_STR);
+    }
+
+    try {
+      $stmt->execute();
+      $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      echo json_encode(["items" => $items]); // Return items based on category and optional tags
+    } catch (PDOException $e) {
+      echo json_encode(["error" => "Database error: " . $e->getMessage()]);
+    }
+  } elseif (isset($_GET['item_id'])) {
     try {
       $item_id = intval($_GET['item_id']);
       $sql = "SELECT * FROM items WHERE item_id = :item_id";
@@ -13,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
       $item = $stmt->fetch(PDO::FETCH_ASSOC);
 
       if ($item) {
-        echo json_encode($item); // Directly return the item without decoding tags
+        echo json_encode($item); // Return the item
       } else {
         echo json_encode(["error" => "Item not found"]);
       }
@@ -25,13 +54,13 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
       $sql = "SELECT * FROM items ORDER BY created_at DESC";
       $stmt = $pdo->query($sql);
       $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-      echo json_encode(["items" => $items]);
+      echo json_encode(["items" => $items]); // Return all items
     } catch (PDOException $e) {
       echo json_encode(["error" => "Error: " . $e->getMessage()]);
     }
   }
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
   $data = json_decode(file_get_contents("php://input"), true);
@@ -41,7 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     empty($data['item_image']) ||
     empty($data['item_desc']) ||
     empty($data['item_price']) ||
-    empty($data['item_stock'])
+    empty($data['item_stock']) ||
+    empty($data['category']) // Ensure category is provided
   ) {
     echo json_encode(["error" => "Missing required fields"]);
     exit();
@@ -53,15 +83,17 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     $item_desc = $data['item_desc'];
     $item_price = floatval($data['item_price']);
     $item_stock = intval($data['item_stock']);
+    $category = $data['category']; // Get category from data
 
+    // Optional: Handle tags if provided
     if (!empty($data['tags']) && is_array($data['tags'])) {
       $tags = '{' . implode(',', $data['tags']) . '}'; // Convert array to PostgreSQL array format
     } else {
       $tags = null; // If no tags, set as null
     }
 
-    $sql = "INSERT INTO items (item_name, item_image, item_desc, item_price, item_stock, tags) 
-            VALUES (:item_name, :item_image, :item_desc, :item_price, :item_stock, :tags)";
+    $sql = "INSERT INTO items (item_name, item_image, item_desc, item_price, item_stock, category, tags) 
+            VALUES (:item_name, :item_image, :item_desc, :item_price, :item_stock, :category, :tags)";
 
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(":item_name", $item_name);
@@ -69,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     $stmt->bindParam(":item_desc", $item_desc);
     $stmt->bindParam(":item_price", $item_price);
     $stmt->bindParam(":item_stock", $item_stock);
+    $stmt->bindParam(":category", $category); // Bind category
     $stmt->bindParam(":tags", $tags);
 
     if ($stmt->execute()) {
@@ -80,6 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     echo json_encode(["error" => "Database error: " . $e->getMessage()]);
   }
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] === "PUT") {
   $data = json_decode(file_get_contents("php://input"), true);
@@ -119,6 +153,11 @@ if ($_SERVER['REQUEST_METHOD'] === "PUT") {
       $params[":item_stock"] = intval($data['item_stock']);
     }
 
+    if (!empty($data['category'])) { // Update category if provided
+      $fields[] = "category = :category";
+      $params[":category"] = $data['category'];
+    }
+
     if (!empty($data['tags']) && is_array($data['tags'])) {
       // Convert array to PostgreSQL array format
       $tags = '{' . implode(',', $data['tags']) . '}';
@@ -143,6 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === "PUT") {
     echo json_encode(["error" => "Database error: " . $e->getMessage()]);
   }
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] === "DELETE") {
   // Retrieve the item_id from the query parameters

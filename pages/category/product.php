@@ -53,7 +53,7 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
                 >
             </div>
             <button id="addToCartBtn" class="primary-cta-btn" 
-                onclick="addToCart(${product.item_id}, ${userId}, parseInt(document.getElementById('quantity').value), ${product.item_price})">
+                onclick="addToCart('${product.item_name}', ${product.item_id}, ${userId}, parseInt(document.getElementById('quantity').value), ${product.item_price})">
                 Add to Cart
             </button>
         </div>
@@ -65,7 +65,7 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
     }
   }
 
-  async function addToCart(itemId, userId, qty, price) {
+  async function addToCart(itemName, itemId, userId, qty, price) {
     const addToCartBtn = document.getElementById("addToCartBtn");
 
     const loader = document.createElement("span");
@@ -76,6 +76,7 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
     const requestData = {
       item_id: itemId,
       user_id: userId,
+      item_name: itemName,
       item_qty: qty,
       item_price: price,
     };
@@ -93,6 +94,9 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
     if (data.success) {
       alert("Item added to cart");
       loader.remove();
+      setTimeout(() => {
+        window.history.back();
+      }, 500);
     } else {
       alert("Error adding item to cart:", data.error);
     }
@@ -108,6 +112,13 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    if (!userId) {
+      alert("You are not logged in. Please log in to view this product.");
+      // Optionally redirect to the login page
+      window.location.href = "/login";
+      return; // Stop further execution of the script
+    }
+
     loadProduct();
-  })
+  });
 </script>

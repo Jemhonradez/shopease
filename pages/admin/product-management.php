@@ -28,10 +28,14 @@
         <label for="stock">Stock</label>
         <input type="number" name="item_stock" required />
       </div>
+      <div class="form-item">
+          <label for="tags">Tags (separate by comma)</label>
+          <input type="text" name="tags" required />
+        </div>
       <div class="line"></div>
       <div class="btn-container">
         <button type="button" class="secondary-cta-btn" onclick="showPopup()">Cancel</button>
-        <button type="submit" class="primary-cta-btn">Add product</button>
+        <button id="create-submit" type="submit" class="primary-cta-btn">Add product</button>
       </div>
     </form>
   </div>

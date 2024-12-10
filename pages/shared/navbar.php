@@ -2,6 +2,7 @@
 
   <div class="container">
     <div class="nav-links">
+      <li class="nav-link"><a href="/category">Unisex</a></li>
       <li class="nav-link"><a href="/category/women">Women</a></li>
       <li class="nav-link"><a href="/category/men">Men</a></li>
     </div>

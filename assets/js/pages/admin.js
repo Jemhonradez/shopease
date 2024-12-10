@@ -1,4 +1,4 @@
-let isOpen = false;
+let isOpen = true;
 let isOpenActionEdit = false;
 let isOpenActionDelete = false;
 
@@ -19,7 +19,7 @@ async function saveChanges(itemId, formData) {
     tags: formData
       .get("tags")
       .split(",")
-      .map((tag) => tag.trim()), // Split tags into an array
+      .map((tag) => tag.trim()),
   };
 
   const file = formData.get("item_image");
@@ -101,7 +101,7 @@ async function confirmDelete(itemId) {
   }
 }
 
-async function editUser(itemId) {
+async function editItem(itemId) {
   const popup = document.querySelector(".action-popup-edit");
 
   popup.innerHTML = `
@@ -118,8 +118,10 @@ async function editUser(itemId) {
       },
     });
     const item = await response.json();
+    console.log(item);
+
     const imageUrl = item.item_image ? item.item_image : "";
-    const tags = item.tags ? item.tags.join(", ") : ""; // Join array into a string
+    const tags = item.tags ? item.tags.replace(/[{}]/g, "").split(",") : [];
 
     popup.innerHTML = `
       <h4>Edit Item ${itemId}</h4>
@@ -138,9 +140,7 @@ async function editUser(itemId) {
         </div>
         <div class="form-item">
           <label for="price">Price</label>
-          <input type="number" name="item_price" value="${formatCurrency(
-            item.item_price
-          )}" required />
+          <input type="number" name="item_price" value="${item.item_price}" required />
         </div>
         <div class="form-item">
           <label for="stock">Stock</label>
@@ -226,7 +226,7 @@ function showActionPopup(event, itemId) {
   const popup = document.querySelector(".action-popup");
 
   popup.innerHTML = `
-  <button type="button" class="action-cta-btn flex-row" onclick="editUser(${itemId})">
+  <button type="button" class="action-cta-btn flex-row" onclick="editItem(${itemId})">
     <i class="ti ti-edit"></i>
     Edit
   </button>
@@ -280,13 +280,11 @@ async function loadProducts() {
         const tableItem = document.createElement("div");
         tableItem.className = "table-item";
 
-        // Handle tags - check if it is a string or array
         let tags = "No tags";
         if (item.tags) {
           if (Array.isArray(item.tags)) {
             tags = item.tags.length > 0 ? item.tags.join(", ") : "No tags";
           } else if (typeof item.tags === "string") {
-            // If tags are a string (PostgreSQL array format), convert it to an array
             tags = item.tags.replace(/[{}"]/g, "").split(",").join(", ");
           }
         }
@@ -345,10 +343,12 @@ if (window.location.pathname === "/admin/product-management") {
     }
   }
 
-  document.getElementById("createForm").addEventListener("submit", async function (e) {
+  const createForm = document.getElementById("createForm");
+
+  createForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const submitBtn = document.querySelector('button[type="submit"]');
+    const submitBtn = document.getElementById("create-submit");
     const loader = document.createElement("span");
     loader.className = "loader";
     submitBtn.appendChild(loader);
@@ -367,7 +367,7 @@ if (window.location.pathname === "/admin/product-management") {
             .get("tags")
             .split(",")
             .map((tag) => tag.trim())
-        : [], // Split and trim tags
+        : [],
     };
 
     const file = data.item_image;
@@ -385,6 +385,7 @@ if (window.location.pathname === "/admin/product-management") {
           if (result.error) {
             alert(result.error);
           } else if (result.message) {
+            createForm.reset();
             alert(result.message);
             setTimeout(() => {
               showPopup();
@@ -405,4 +406,230 @@ if (window.location.pathname === "/admin/product-management") {
   });
 
   loadProducts();
+}
+
+if (window.location.pathname === "/admin") {
+  async function loadReports() {
+    const reports = document.querySelector(".reports");
+
+    reports.innerHTML = "";
+
+    const loaderDiv = document.createElement("div");
+    loaderDiv.className = "loader-container";
+    const loader = document.createElement("span");
+    loader.className = "loader";
+    reports.appendChild(loaderDiv);
+    loaderDiv.appendChild(loader);
+
+    try {
+      const itemsResponse = await fetch("/api/products.php");
+      const ordersResponse = await fetch("/api/orders.php");
+      const paymentsResponse = await fetch("/api/payments.php");
+
+      const dataItems = await itemsResponse.json();
+      const dataOrders = await ordersResponse.json();
+      const dataPayments = await paymentsResponse.json();
+
+      const items = dataItems.items;
+      const orders = dataOrders.orders;
+      const payments = dataPayments.payments;
+
+      console.log(items)
+      console.log(orders)
+      console.log(payments)
+
+      loaderDiv.remove();
+
+      reports.innerHTML = `
+      <div class="report-card">
+        <h3>Items Inventory</h3>
+        <canvas id="itemsChart"></canvas>
+      </div>
+
+      <div class="report-card">
+        <h3>Top-selling Products</h3>
+        <canvas id="topSellingChart"></canvas>
+      </div>
+
+      <div class="report-card">
+        <h3>Orders Overview</h3>
+        <canvas id="ordersChart"></canvas>
+      </div>
+
+      <div class="report-card">
+        <h3>Payments Overview</h3>
+        <canvas id="paymentsChart"></canvas>
+      </div>
+      `;
+
+      const itemsInventoryData = items.map((item) => item.item_name);
+      const itemsStockData = items.map((item) => item.item_stock);
+
+      const itemsChart = new Chart(document.getElementById("itemsChart"), {
+        type: "bar",
+        data: {
+          labels: itemsInventoryData,
+          datasets: [
+            {
+              label: "Items in Stock",
+              data: itemsStockData,
+              backgroundColor: "rgba(75, 192, 192, 0.6)",
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+
+      const itemSalesData = getItemSalesData(orders);
+
+      const topSellingProducts = getTopSellingProducts(itemSalesData);
+      const topSellingNames = topSellingProducts.map((item) => item.name);
+      const topSellingSales = topSellingProducts.map((item) => item.sales);
+
+      const topSellingChart = new Chart(document.getElementById("topSellingChart"), {
+        type: "bar",
+        data: {
+          labels: topSellingNames,
+          datasets: [
+            {
+              label: "Top-selling Products",
+              data: topSellingSales,
+              backgroundColor: "rgba(153, 102, 255, 0.6)",
+              borderColor: "rgba(153, 102, 255, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+
+      const orderStatuses = ["processing", "pending", "completed"];
+      const orderStatusCount = getOrderStatusCount(orders);
+
+      const ordersChart = new Chart(document.getElementById("ordersChart"), {
+        type: "bar",
+        data: {
+          labels: orderStatuses,
+          datasets: [
+            {
+              label: "Orders by Status",
+              data: orderStatusCount,
+              backgroundColor: "rgba(255, 159, 64, 0.6)",
+              borderColor: "rgba(255, 159, 64, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+
+      const paymentsByDate = getPaymentsByDate(payments);
+      const paymentDates = Object.keys(paymentsByDate);
+      const dailyTotals = Object.values(paymentsByDate);
+
+      const paymentsOverTimeChart = new Chart(document.getElementById("paymentsChart"), {
+        type: "line",
+        data: {
+          labels: paymentDates,
+          datasets: [
+            {
+              label: "Total Payments by Date",
+              data: dailyTotals,
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 2,
+              tension: 0.4,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error loading reports:", error);
+    }
+  }
+
+  function getTopSellingProducts(items) {
+    return items
+      .filter((item) => item.item_sales > 0)
+      .sort((a, b) => b.item_sales - a.item_sales)
+      .slice(0, 5)
+      .map((item) => ({ name: item.item_name, sales: item.item_sales }));
+  }
+
+  function getOrderStatusCount(orders) {
+    const statusCount = { processing: 0, pending: 0, completed: 0 };
+    orders.forEach((order) => {
+      statusCount[order.order_status]++;
+    });
+    return [statusCount["processing"], statusCount["pending"], statusCount["completed"]];
+  }
+
+  function getPaymentsByDate(payments) {
+    const dateTotals = {};
+    payments.forEach((payment) => {
+      const date = payment.payment_date.split(" ")[0];
+      const amount = parseFloat(payment.amount);
+      if (!dateTotals[date]) {
+        dateTotals[date] = 0;
+      }
+      dateTotals[date] += amount;
+    });
+    return dateTotals;
+  }
+
+  function getItemSalesData(orders) {
+    const salesData = {};
+
+    orders.forEach((order) => {
+      const itemId = order.item_id;
+      const itemName = order.item_name;
+      const itemPrice = parseFloat(order.item_price);
+      const itemQty = order.item_qty;
+      const salesAmount = itemQty * itemPrice;
+
+      if (!salesData[itemId]) {
+        salesData[itemId] = {
+          item_id: itemId,
+          item_name: itemName,
+          item_sales: 0,
+        };
+      }
+      salesData[itemId].item_sales += salesAmount;
+    });
+
+    return Object.values(salesData);
+  }
+
+  loadReports();
 }

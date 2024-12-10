@@ -29,7 +29,7 @@ $userId = $_SESSION["user_id"];
         <label for="password">Password</label>
         <div class="flex-col">
           <input type="password" name="currentPassword" placeholder="Current password" />
-          <input type="password" name="newPassword" placeholder="New password" />
+          <input type="password" name="password" placeholder="New password" />
         </div>
       </div>
       <div class="line"></div>
@@ -39,6 +39,7 @@ $userId = $_SESSION["user_id"];
       </div>
     </form>
   </div>
+
   <section class="profile-wrapper --first">
     <h1 class="title">Welcome back <?php echo ucfirst($_SESSION['username']) ?></h1>
     <div class="tab-menu flex-row align-center">
@@ -51,35 +52,7 @@ $userId = $_SESSION["user_id"];
 
     <div class="account-details view-section">
       <h3>Account Details</h3>
-      <div class="card">
-        <div class="space-btwn">
-          <h4>Profile & Security</h4>
-          <p class="clickable" onclick="showPopup()">Edit</p>
-        </div>
-        <div class="item">
-          <p class="title">Full Name</p>
-          <p class="desc" name="name">Loading...</p>
-        </div>
-        <div class="item">
-          <p class="title">Balance</p>
-          <p class="desc" name="balance">Loading...</p>
-        </div>
-        <div class="item">
-          <p class="title">Username</p>
-          <p class="desc" name="username">Loading...</p>
-        </div>
-        <div class="item">
-          <p class="title">Phone number</p>
-          <p class="desc" name="contact_no">Loading...</p>
-        </div>
-        <div class="item">
-          <p class="title">Address</p>
-          <p class="desc" name="address">Loading...</p>
-        </div>
-        <div class="item">
-          <p class="title">Password</p>
-          <p class="desc" name="password">*********</p>
-        </div>
+      <div id="account-card" class="card">
       </div>
     </div>
 
@@ -157,7 +130,7 @@ $userId = $_SESSION["user_id"];
       if (payments.length === 0) {
         orderHistorySection.innerHTML = "<p>No payments found.</p>";
       } else {
-        payments.forEach((payment) => {
+        payments.payments.forEach((payment) => {
           const paymentElement = document.createElement("div");
           paymentElement.classList.add("payment-item");
 

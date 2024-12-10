@@ -26,6 +26,11 @@ switch ($request) {
     include 'pages/profile.php';
     break;
 
+  case '/category':
+    $tag = $_GET['tag'] ?? null;
+    include 'pages/category/index.php';
+    break;
+
   case '/category/women':
     include 'pages/category/women.php';
     break;
@@ -33,6 +38,7 @@ switch ($request) {
   case '/category/men':
     include 'pages/category/men.php';
     break;
+
   case '/admin':
     include 'pages/admin/admin.php';
     break;
@@ -45,12 +51,14 @@ switch ($request) {
     include 'pages/payment.php';
     break;
 
-    default:
+  default:
     if (preg_match('#^/category/(women|men)/product.php$#', $request, $matches)) {
-        $category = $matches[1];
-        include "pages/category/product.php";
+      $category = $matches[1];
+      include "pages/category/product.php";
+    } else if (preg_match('#^/category/product.php$#', $request, $matches)) {
+      include "pages/category/product.php";
     } else {
-        include 'pages/404.php';
+      include 'pages/404.php';
     }
     break;
 }

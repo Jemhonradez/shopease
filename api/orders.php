@@ -2,37 +2,56 @@
 include_once "../config/db.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    if (!isset($_GET['user_id'])) {
-        echo json_encode(["error" => "Missing user_id parameter"]);
-        exit();
-    }
+    if (isset($_GET['user_id'])) {
+        // Fetch orders for a specific user
+        $user_id = $_GET['user_id'];
 
-    $user_id = $_GET['user_id'];
-
-    try {
-        // Fetch all orders for the given user_id, joining with the items table to include item details (like item_image) and the order status
-        $sql = "
-            SELECT orders.order_id, orders.item_id, orders.item_qty, orders.order_status, items.item_name, items.item_image, items.item_price
+        try {
+            // Fetch all orders for the given user_id, joining with the items table to include item details
+            $sql = "
+            SELECT orders.order_id, orders.item_id, orders.item_qty, orders.order_status, 
+                    items.item_name, items.item_image, items.item_price
             FROM orders
             JOIN items ON orders.item_id = items.item_id
             WHERE orders.user_id = :user_id
         ";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':user_id', $user_id);
-        $stmt->execute();
-        $orders = $stmt->fetchAll();
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->execute();
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC); // Ensures you get an associative array
 
-        if ($orders) {
-            echo json_encode(["orders" => $orders]);
-        } else {
-            echo json_encode(["message" => "No orders found for this user"]);
+            if ($orders) {
+                echo json_encode(["orders" => $orders]);
+            } else {
+                echo json_encode(["message" => "No orders found for this user"]);
+            }
+        } catch (PDOException $e) {
+            echo json_encode(["error" => "Database error: " . $e->getMessage()]);
         }
-    } catch (PDOException $e) {
-        echo json_encode(["error" => "Database error: " . $e->getMessage()]);
+    } else {
+        // Fetch all orders from the database (for any user)
+        try {
+            // Fetch all orders, joining with the items table
+            $sql = "
+            SELECT orders.order_id, orders.item_id, orders.user_id, orders.item_qty, orders.order_status, 
+                    items.item_name, items.item_image, items.item_price
+            FROM orders
+            JOIN items ON orders.item_id = items.item_id
+        ";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC); // Ensures you get an associative array
+
+            if ($orders) {
+                echo json_encode(["orders" => $orders]);
+            } else {
+                echo json_encode(["message" => "No orders found"]);
+            }
+        } catch (PDOException $e) {
+            echo json_encode(["error" => "Database error: " . $e->getMessage()]);
+        }
     }
 }
-
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get the raw POST data
     $data = json_decode(file_get_contents("php://input"), true);
@@ -46,18 +65,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get values from request
     $item_id = $data['item_id'];
     $user_id = $data['user_id'];
+    $item_name = $data['item_name'];
     $item_price = intval($data['item_price']);
     $item_qty = intval($data['item_qty']);
     $order_status = 'processing'; // Default status
 
     try {
         // Insert the order into the orders table
-        $sql = "INSERT INTO orders (item_price, item_id, user_id, item_qty, order_status) 
-                VALUES (:item_price, :item_id, :user_id, :item_qty, :order_status)";
+        $sql = "INSERT INTO orders (item_price, item_id, user_id, item_name, item_qty, order_status) 
+                VALUES (:item_price, :item_id, :user_id, :item_name, :item_qty, :order_status)";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':item_price', $item_price);
         $stmt->bindParam(':item_id', $item_id);
         $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':item_name', $item_name);
         $stmt->bindParam(':item_qty', $item_qty);
         $stmt->bindParam(':order_status', $order_status);
 
