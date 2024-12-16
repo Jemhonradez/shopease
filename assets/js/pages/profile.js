@@ -76,8 +76,8 @@ function showPopup() {
   document.querySelector('input[name="username"]').value = user.username;
   document.querySelector('input[name="contact_no"]').value = user.contact_no;
   document.querySelector('input[name="address"]').value = user.address;
-  document.querySelector('input[name="currentPassword"]').value = ""
-  document.querySelector('input[name="password"]').value = ""
+  document.querySelector('input[name="currentPassword"]').value = "";
+  document.querySelector('input[name="password"]').value = "";
 
   const popup = document.querySelector(".edit-details");
   setTimeout(() => {
@@ -90,10 +90,23 @@ function showPopup() {
   }, 50);
 }
 
+let isOpenBalance = true;
+function showPopupBalance() {
+  const popup = document.querySelector(".edit-balance");
+  setTimeout(() => {
+    if (isOpenBalance) {
+      popup.classList.add("show");
+    } else {
+      popup.classList.remove("show");
+    }
+    isOpenBalance = !isOpenBalance;
+  }, 50);
+}
+
 document.getElementById("editForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
-  const submitBtn = document.querySelector("button[type='submit'");
+  const submitBtn = document.querySelector("button[type='submit']");
 
   const loader = document.createElement("span");
   loader.className = "loader";
@@ -129,3 +142,83 @@ document.getElementById("editForm").addEventListener("submit", function (e) {
       alert(error.message);
     });
 });
+
+document.getElementById("editBalance").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const submitBtn = document.getElementById("balancebtn");
+
+  const loader = document.createElement("span");
+  loader.className = "loader";
+  submitBtn.appendChild(loader);
+  submitBtn.disabled = true;
+
+  const amount = document.querySelector("input[name='amount']").value;
+
+  const data = {
+    amount: parseFloat(amount),
+  };
+
+  postData("/api/topupBalance.php", null, data)
+    .then((result) => {
+      loader.remove();
+      submitBtn.disabled = false;
+      if (result.error) {
+        alert(result.error);
+      } else if (result.message) {
+        alert(result.message);
+        setTimeout(() => {
+          location.reload();
+        }, 500);
+      }
+    })
+    .catch((error) => {
+      loader.remove();
+      submitBtn.disabled = false;
+      alert(error.message);
+    });
+});
+
+async function markCompleted(paymentId) {
+  postData("/api/markOrderComplete.php", null, paymentId)
+    .then((result) => {
+      if (result.error) {
+        alert(result.error);
+      } else if (result.message) {
+        alert(result.message);
+        setTimeout(() => {
+          location.reload();
+        }, 500);
+      }
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+}
+
+async function markCompleted(paymentId) {
+  try {
+    const response = await fetch("/api/markOrderComplete.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        payment_id: paymentId,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      alert(result.message);
+      setTimeout(() => {
+        location.reload();
+      }, 500);
+    } else {
+      alert(result.error);
+    }
+  } catch (error) {
+    alert("An error occurred: " + error.message);
+  }
+}

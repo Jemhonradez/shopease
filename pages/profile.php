@@ -40,6 +40,18 @@ $userId = $_SESSION["user_id"];
     </form>
   </div>
 
+  <div class="edit-balance card popup">
+    <h4>How much do you want to topup?</h4>
+    <form id="editBalance" class="form-container">
+      <input name="amount" type="number" />
+      <div class="line"></div>
+      <div class="btn-container">
+        <button type="button" class="secondary-cta-btn" onclick="showPopupBalance()">Cancel</button>
+        <button id="balancebtn" type="submit" class="primary-cta-btn">Top up</button>
+      </div>
+    </form>
+  </div>
+
   <section class="profile-wrapper --first">
     <h1 class="title">Welcome back <?php echo ucfirst($_SESSION['username']) ?></h1>
     <div class="tab-menu flex-row align-center">
@@ -54,13 +66,23 @@ $userId = $_SESSION["user_id"];
       <h3>Account Details</h3>
       <div id="account-card" class="card">
       </div>
+      <button type="button" class="primary-cta-btn" style="margin-top: 15px;" onclick="showPopupBalance()">Top up balance</button>
     </div>
 
     <div class="order-history view-section" style="display: none;">
       <h3>Order History</h3>
-      <div id="history-card" class="card">
+      <div class="table-wrapper">
+        <div class="table-header">
+          <h4>Order Id</h4>
+          <h4>Item Bought</h4>
+          <h4>Amount</h4>
+          <h4>Date</h4>
+          <h4>Status</h4>
+          <h4>Confirm order?</h4>
+        </div>
+        <div class="table-content">
+        </div>
       </div>
-    </div>
   </section>
 </main>
 
@@ -103,16 +125,15 @@ $userId = $_SESSION["user_id"];
 
   // Function to load order history (payments)
   async function loadOrderHistory() {
-    const card = document.getElementById("history-card");
+    const table = document.querySelector(".table-content");
+
+    table.innerHTML = "";
 
     const loaderDiv = document.createElement("div");
     loaderDiv.className = "loader-container";
     const loader = document.createElement("span");
     loader.className = "loader";
-
-    // Clear the previous cart content and show loader
-    card.innerHTML = "";
-    card.appendChild(loaderDiv);
+    table.appendChild(loaderDiv);
     loaderDiv.appendChild(loader);
 
     try {
@@ -121,28 +142,41 @@ $userId = $_SESSION["user_id"];
       });
 
       const payments = await response.json();
-
-      const orderHistorySection = document.querySelector(".order-history .card");
-      orderHistorySection.innerHTML = "";
-
       loaderDiv.remove();
 
+
       if (payments.length === 0) {
-        orderHistorySection.innerHTML = "<p>No payments found.</p>";
+        const noProductsMessage = document.createElement("p");
+        noProductsMessage.className = "no-products-message";
+        noProductsMessage.textContent = "No orders found";
+        table.appendChild(noProductsMessage);;
       } else {
         payments.payments.forEach((payment) => {
-          const paymentElement = document.createElement("div");
-          paymentElement.classList.add("payment-item");
+          const tableItem = document.createElement("div");
+          tableItem.className = "table-item";
 
-          paymentElement.innerHTML = `
-          <p><strong>Payment ID:</strong> ${payment.payment_id}</p>
-          <p><strong>Order ID:</strong> ${payment.order_id}</p>
-          <p><strong>Amount:</strong> ${formatCurrency(payment.amount)}</p>
-          <p><strong>Date:</strong> ${payment.payment_date}</p>
-          <p><strong>Status:</strong> ${payment.payment_status}</p>
+          tableItem.innerHTML = `
+          <p>${payment.payment_id}</p>
+          <div class="item-container">
+            <div class="item-image">
+              <img src="${payment.item_image}" alt="${payment.item_name}">
+            </div>
+            <div>
+            <h4>${payment.item_name}</h4>
+            </div>
+          </div>
+          <p>${formatCurrency(payment.amount)}</p>
+          <p>${new Date(payment.payment_date).toLocaleDateString()}</p>
+          <p>${payment.payment_status}</p>
+          <button type="button" class="action-btn" onclick="markCompleted(${
+            payment.payment_id
+          })">
+            Mark as complete
+            <i class="ti ti-checks"></i>
+          </button>
         `;
 
-          orderHistorySection.appendChild(paymentElement);
+          table.appendChild(tableItem);
         });
       }
     } catch (error) {

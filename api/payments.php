@@ -138,7 +138,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $user_id = $_GET['user_id'];
 
     try {
-      $query = "SELECT * FROM payments WHERE user_id = :user_id ORDER BY payment_date DESC";
+      // Modified query to include item_image from items table
+      $query = "SELECT p.*, o.order_id, o.item_id, o.item_qty, o.item_name, o.item_price, i.item_image
+                FROM payments p
+                JOIN orders o ON p.order_id = o.order_id
+                JOIN items i ON o.item_id = i.item_id
+                WHERE p.user_id = :user_id
+                ORDER BY p.payment_date DESC";
       $stmt = $pdo->prepare($query);
       $stmt->bindParam(':user_id', $user_id);
       $stmt->execute();
@@ -152,7 +158,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $order_id = $_GET['order_id'];
 
     try {
-      $query = "SELECT * FROM payments WHERE order_id = :order_id ORDER BY payment_date DESC";
+      // Modified query to include item_image from items table
+      $query = "SELECT p.*, o.order_id, o.item_id, o.item_qty, o.item_name, o.item_price, i.item_image
+                FROM payments p
+                JOIN orders o ON p.order_id = o.order_id
+                JOIN items i ON o.item_id = i.item_id
+                WHERE p.order_id = :order_id
+                ORDER BY p.payment_date DESC";
       $stmt = $pdo->prepare($query);
       $stmt->bindParam(':order_id', $order_id);
       $stmt->execute();
@@ -165,7 +177,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   } else {
     // If neither user_id nor order_id is provided, fetch all payments
     try {
-      $query = "SELECT * FROM payments ORDER BY payment_date DESC";
+      // Modified query to include item_image from items table
+      $query = "SELECT p.*, o.order_id, o.item_id, o.item_qty, o.item_name, o.item_price, i.item_image
+                FROM payments p
+                JOIN orders o ON p.order_id = o.order_id
+                JOIN items i ON o.item_id = i.item_id
+                ORDER BY p.payment_date DESC";
       $stmt = $pdo->prepare($query);
       $stmt->execute();
 
@@ -176,6 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
   }
 }
+
 
 // Update payment status (PUT)
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {

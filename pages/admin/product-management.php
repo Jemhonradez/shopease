@@ -1,3 +1,18 @@
+<?php
+session_start();
+
+$user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'guest';
+?>
+
+<script>
+  var userType = "<?php echo $user_type; ?>";
+
+  if (userType !== "admin") {
+    alert("You're not authorized to view this page.")
+    window.location.href = "/";
+  }
+</script>
+
 <main id="product-mngmt">
   <div class="action-popup card">
   </div>
