@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Check if the user is logged in and the user_id exists in session
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 ?>
 
@@ -102,7 +101,6 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
     }
   }
 
-  // Handle quantity input to ensure the value stays within the stock range
   function handleQuantityChange(inputElement, maxStock) {
     if (inputElement.value < 1) {
       inputElement.value = 1;
@@ -114,9 +112,8 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
   document.addEventListener("DOMContentLoaded", () => {
     if (!userId) {
       alert("You are not logged in. Please log in to view this product.");
-      // Optionally redirect to the login page
       window.location.href = "/login";
-      return; // Stop further execution of the script
+      return;
     }
 
     loadProduct();

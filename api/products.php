@@ -5,14 +5,12 @@ require_once "../config/db.php";
 if ($_SERVER['REQUEST_METHOD'] === "GET") {
   if (isset($_GET['category'])) {
     $category = $_GET['category'];
-    $tags = isset($_GET['tags']) ? $_GET['tags'] : null; // Optional tags parameter
+    $tags = isset($_GET['tags']) ? $_GET['tags'] : null;
 
-    // Prepare the query with category and optional tags filter
     $sql = "SELECT * FROM items WHERE category = :category";
 
-    // If tags are provided, add them to the SQL query
     if ($tags) {
-      $sql .= " AND FIND_IN_SET(:tags, tags) > 0"; // Assuming tags are stored as comma-separated strings
+      $sql .= " AND FIND_IN_SET(:tags, tags) > 0";
     }
 
     $sql .= " ORDER BY created_at DESC";
@@ -20,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(":category", $category, PDO::PARAM_STR);
 
-    // Bind the tags parameter if it's present
     if ($tags) {
       $stmt->bindParam(":tags", $tags, PDO::PARAM_STR);
     }
@@ -28,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
     try {
       $stmt->execute();
       $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      echo json_encode(["items" => $items]); // Return items based on category and optional tags
+      echo json_encode(["items" => $items]);
     } catch (PDOException $e) {
       echo json_encode(["error" => "Database error: " . $e->getMessage()]);
     }
@@ -42,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
       $item = $stmt->fetch(PDO::FETCH_ASSOC);
 
       if ($item) {
-        echo json_encode($item); // Return the item
+        echo json_encode($item);
       } else {
         echo json_encode(["error" => "Item not found"]);
       }
@@ -54,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === "GET") {
       $sql = "SELECT * FROM items ORDER BY created_at DESC";
       $stmt = $pdo->query($sql);
       $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      echo json_encode(["items" => $items]); // Return all items
+      echo json_encode(["items" => $items]);
     } catch (PDOException $e) {
       echo json_encode(["error" => "Error: " . $e->getMessage()]);
     }

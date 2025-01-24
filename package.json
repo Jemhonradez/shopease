@@ -4,8 +4,8 @@
   "main": "index.php",
   "scripts": {
     "start": "concurrently \"npm run scss\" \"npm run browsersync\"",
-    "scss": "sass --watch scss:css",
-    "browsersync": "browser-sync start --config bs-config.js"
+    "scss": "sass --watch styles:build/css",
+    "bs": "browser-sync start --config bs-config.js"
   },
   "keywords": [],
   "author": "",
@@ -17,9 +17,15 @@
     "shopease": "file:"
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.20",
     "browser-sync": "^3.0.3",
     "concurrently": "^9.1.0",
+    "gulp": "^5.0.0",
+    "gulp-postcss": "^10.0.0",
     "jsonwebtoken": "^9.0.2",
+    "postcss-import": "^16.1.0",
+    "postcss-nested": "^7.0.2",
+    "postcss-simple-vars": "^7.0.1",
     "sass": "^1.81.1"
   }
 }

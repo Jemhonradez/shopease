@@ -18,10 +18,8 @@ if (empty($order_ids)) {
 }
 
 try {
-  // Begin transaction
   $pdo->beginTransaction();
 
-  // Fetch user balance
   $stmt = $pdo->prepare("SELECT balance FROM users WHERE user_id = :user_id");
   $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
   $stmt->execute();
@@ -35,9 +33,7 @@ try {
 
   $balance = $user['balance'];
 
-  // Process each order
   foreach ($order_ids as $order_id) {
-    // Fetch order details
     $stmt = $pdo->prepare("SELECT order_id, item_id, item_price, item_qty FROM orders WHERE user_id = :user_id AND order_id = :order_id");
     $stmt->bindParam(':user_id', $user_id);
     $stmt->bindParam(':order_id', $order_id);
@@ -52,14 +48,12 @@ try {
 
     $orderTotal = $order['item_price'] * $order['item_qty'];
 
-    // Check if balance is sufficient
     if ($balance < $orderTotal) {
       echo json_encode(["error" => "Insufficient funds for order ID $order_id."]);
       $pdo->rollBack();
       exit();
     }
 
-    // Deduct stock from the product
     $productQuery = $pdo->prepare("UPDATE items SET item_stock = item_stock - :item_qty WHERE item_id = :item_id AND item_stock >= :item_qty");
     $productQuery->bindParam(':item_qty', $order['item_qty']);
     $productQuery->bindParam(':item_id', $order['item_id']);
@@ -69,30 +63,24 @@ try {
       throw new Exception("Insufficient stock for product ID: {$order['item_id']}");
     }
 
-    // Deduct from balance
     $balance -= $orderTotal;
 
-    // Create payment record
     $stmt = $pdo->prepare("INSERT INTO payments (user_id, order_id, amount) VALUES (:user_id, :order_id, :amount)");
     $stmt->bindParam(':user_id', $user_id);
     $stmt->bindParam(':order_id', $order_id);
     $stmt->bindParam(':amount', $orderTotal);
     $stmt->execute();
 
-    // Delete the order
     $stmt = $pdo->prepare("DELETE FROM orders WHERE user_id = :user_id AND order_id = :order_id");
     $stmt->bindParam(':user_id', $user_id);
     $stmt->bindParam(':order_id', $order_id);
     $stmt->execute();
   }
-
-  // Update user's balance
   $stmt = $pdo->prepare("UPDATE users SET balance = :balance WHERE user_id = :user_id");
   $stmt->bindParam(':balance', $balance);
   $stmt->bindParam(':user_id', $user_id);
   $stmt->execute();
 
-  // Commit transaction
   $pdo->commit();
 
   echo json_encode(["success" => "Checkout completed successfully."]);

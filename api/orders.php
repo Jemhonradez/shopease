@@ -3,11 +3,9 @@ include_once "../config/db.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['user_id'])) {
-        // Fetch orders for a specific user
         $user_id = $_GET['user_id'];
 
         try {
-            // Fetch all orders for the given user_id, joining with the items table to include item details
             $sql = "
             SELECT orders.order_id, orders.item_id, orders.item_qty, orders.order_status, 
                     items.item_name, items.item_image, items.item_price
@@ -18,8 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':user_id', $user_id);
             $stmt->execute();
-            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC); // Ensures you get an associative array
-
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if ($orders) {
                 echo json_encode(["orders" => $orders]);
             } else {
@@ -29,9 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             echo json_encode(["error" => "Database error: " . $e->getMessage()]);
         }
     } else {
-        // Fetch all orders from the database (for any user)
         try {
-            // Fetch all orders, joining with the items table
             $sql = "
             SELECT orders.order_id, orders.item_id, orders.user_id, orders.item_qty, orders.order_status, 
                     items.item_name, items.item_image, items.item_price
@@ -40,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         ";
             $stmt = $pdo->prepare($sql);
             $stmt->execute();
-            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC); // Ensures you get an associative array
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             if ($orders) {
                 echo json_encode(["orders" => $orders]);
@@ -53,25 +48,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get the raw POST data
     $data = json_decode(file_get_contents("php://input"), true);
 
-    // Check if required fields are provided
     if (empty($data['item_id']) || empty($data['user_id']) || empty($data['item_qty'])) {
         echo json_encode(["error" => "Missing required fields"]);
         exit();
     }
 
-    // Get values from request
     $item_id = $data['item_id'];
     $user_id = $data['user_id'];
     $item_name = $data['item_name'];
     $item_price = intval($data['item_price']);
     $item_qty = intval($data['item_qty']);
-    $order_status = 'processing'; // Default status
+    $order_status = 'processing';
 
     try {
-        // Insert the order into the orders table
         $sql = "INSERT INTO orders (item_price, item_id, user_id, item_name, item_qty, order_status) 
                 VALUES (:item_price, :item_id, :user_id, :item_name, :item_qty, :order_status)";
         $stmt = $pdo->prepare($sql);
@@ -93,12 +84,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
-// PUT request - Update an existing order (e.g., change item quantity)
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-    // Get the raw POST data
     parse_str(file_get_contents("php://input"), $data);
 
-    // Validate input
     if (empty($data['order_id']) || empty($data['item_qty'])) {
         echo json_encode(["error" => "Missing required fields"]);
         exit();
@@ -108,7 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $item_qty = intval($data['item_qty']);
 
     try {
-        // Update the item quantity in the orders table
         $sql = "UPDATE orders SET item_qty = :item_qty WHERE order_id = :order_id";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':item_qty', $item_qty);
@@ -125,14 +112,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 }
 
 
-// DELETE request - Remove an order from the cart
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    // Get the raw POST data
     $data = json_decode(file_get_contents("php://input"), true);
 
-    // Check if we're removing a single order or all orders
     if (isset($data['order_id'])) {
-        // Deleting a single order
         $order_id = $data['order_id'];
 
         if (empty($order_id)) {
@@ -141,7 +124,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         }
 
         try {
-            // Delete the specific order from the orders table
             $sql = "DELETE FROM orders WHERE order_id = :order_id";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':order_id', $order_id);
@@ -155,7 +137,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
             echo json_encode(["error" => "Database error: " . $e->getMessage()]);
         }
     } elseif (isset($data['user_id'])) {
-        // Deleting all orders for a user
         $user_id = (int) $data['user_id'];
 
         if (empty($user_id)) {
@@ -164,7 +145,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         }
 
         try {
-            // Delete all orders for the user from the orders table
             $sql = "DELETE FROM orders WHERE user_id = :user_id";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':user_id', $user_id);

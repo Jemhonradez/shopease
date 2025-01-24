@@ -1,6 +1,6 @@
 module.exports = {
-  proxy: "localhost:4000",
-  files: ["**/*.php", "css/*.css", "js/*.js"],
+  proxy: "localhost:8000",
+  files: ["**/*.php", "build/*.css", "assets/js/*.js"],
   injectChanges: true,
   open: true,
   notify: false,

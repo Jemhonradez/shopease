@@ -5,7 +5,6 @@ require_once "../config/db.php";
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  // Check if the user is authenticated
   if (!isset($_SESSION['user_id'])) {
     echo json_encode(["error" => "User not authenticated."]);
     exit();
@@ -14,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $user_id = $_SESSION['user_id'];
   $data = json_decode(file_get_contents("php://input"), true);
 
-  // Validate required data
   if (!isset($data['order_ids']) || !is_array($data['order_ids']) || empty($data['order_ids'])) {
     echo json_encode(["error" => "Order IDs are required."]);
     exit();
@@ -23,10 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $order_ids = $data['order_ids'];
 
   try {
-    // Start transaction
     $pdo->beginTransaction();
 
-    // Fetch user balance
     $stmt = $pdo->prepare("SELECT balance FROM users WHERE user_id = :user_id");
     $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $stmt->execute();
@@ -43,7 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $orderDetails = [];
 
     foreach ($order_ids as $order_id) {
-      // Fetch order details
       $stmt = $pdo->prepare("SELECT order_id, item_id, item_price, item_qty, order_status, item_name FROM orders 
                             WHERE user_id = :user_id AND order_id = :order_id");
       $stmt->bindParam(':user_id', $user_id);
@@ -61,12 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       $orderTotal = $order['item_price'] * $order['item_qty'];
 
-      // Check if balance is sufficient
       if ($balance < $orderTotal) {
         throw new Exception("Insufficient funds for order ID $order_id.");
       }
 
-      // Deduct stock from the product
       $productQuery = $pdo->prepare("UPDATE items SET item_stock = item_stock - :item_qty 
                                     WHERE item_id = :item_id AND item_stock >= :item_qty");
       $productQuery->bindParam(':item_qty', $order['item_qty']);
@@ -77,11 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         throw new Exception("Insufficient stock for product ID: {$order['item_id']}");
       }
 
-      // Deduct from balance and increment total amount
       $balance -= $orderTotal;
       $totalAmount += $orderTotal;
 
-      // Create payment record
       $stmt = $pdo->prepare("INSERT INTO payments (user_id, order_id, amount, payment_status) 
                             VALUES (:user_id, :order_id, :amount, 'pending')");
       $stmt->bindParam(':user_id', $user_id);
@@ -89,7 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->bindParam(':amount', $orderTotal);
       $stmt->execute();
 
-      // Update the order status
       $stmt = $pdo->prepare("UPDATE orders SET order_status = 'pending' 
                             WHERE user_id = :user_id AND order_id = :order_id");
       $stmt->bindParam(':user_id', $user_id);
@@ -106,13 +96,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       ];
     }
 
-    // Update user's balance
     $stmt = $pdo->prepare("UPDATE users SET balance = :balance WHERE user_id = :user_id");
     $stmt->bindParam(':balance', $balance);
     $stmt->bindParam(':user_id', $user_id);
     $stmt->execute();
 
-    // Commit transaction
     $pdo->commit();
 
     echo json_encode([
@@ -133,12 +121,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $payments = [];
 
-  // Check if user_id or order_id is provided in the query
   if (isset($_GET['user_id'])) {
     $user_id = $_GET['user_id'];
 
     try {
-      // Modified query to include item_image from items table
       $query = "SELECT p.*, o.order_id, o.item_id, o.item_qty, o.item_name, o.item_price, i.item_image
                 FROM payments p
                 JOIN orders o ON p.order_id = o.order_id
@@ -158,7 +144,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $order_id = $_GET['order_id'];
 
     try {
-      // Modified query to include item_image from items table
       $query = "SELECT p.*, o.order_id, o.item_id, o.item_qty, o.item_name, o.item_price, i.item_image
                 FROM payments p
                 JOIN orders o ON p.order_id = o.order_id
@@ -175,9 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
       echo json_encode(["error" => "Error: " . $e->getMessage()]);
     }
   } else {
-    // If neither user_id nor order_id is provided, fetch all payments
     try {
-      // Modified query to include item_image from items table
       $query = "SELECT p.*, o.order_id, o.item_id, o.item_qty, o.item_name, o.item_price, i.item_image
                 FROM payments p
                 JOIN orders o ON p.order_id = o.order_id
@@ -195,7 +178,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 
-// Update payment status (PUT)
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
   parse_str(file_get_contents("php://input"), $put_vars);
 
@@ -219,7 +201,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
   }
 }
 
-// Delete a payment (DELETE)
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
   parse_str(file_get_contents("php://input"), $delete_vars);
 
